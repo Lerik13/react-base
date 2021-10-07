@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import PostList from './components/PostList';
 import MyButton from './components/UI/button/MyButton';
 import MyInput from './components/UI/input/MyInput';
@@ -12,13 +12,19 @@ function App() {
 	]);
 
 	const [title, setTitle] = useState('')
-
-	const bodyInputRef = useRef(); // to get access to Uncontrolled component
+	const [body, setBody] = useState('')
 
 	const addNewPost = (e) => {
 		e.preventDefault();
-		console.log(title);
-		console.log(bodyInputRef.current.value);
+
+		const newPost = {
+			id: Date.now(),
+			title,
+			body
+		}
+		setPosts([...posts, newPost])
+		setTitle('')
+		setBody('')
 	}
 
 	return (
@@ -31,9 +37,9 @@ function App() {
 					type="text"
 					placeholder="Title of Post"
 				/>
-				<input ref={bodyInputRef} type="text"/>
  				<MyInput 
-					ref={bodyInputRef}
+					value={body}
+					onChange={e => setBody(e.target.value)}
 					type="text"
 					placeholder="Description of Post"
 				/>
