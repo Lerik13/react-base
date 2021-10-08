@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react';
 import PostFilter from './components/PostFilter';
 import PostForm from './components/PostForm';
 import PostList from './components/PostList';
-import MyInput from './components/UI/input/MyInput';
-import MySelect from './components/UI/select/MySelect';
 import './styles/App.css';
 
 function App() {
@@ -41,11 +39,7 @@ function App() {
 				filter={filter}
 				setFilter={setFilter} 
 			/>
-			{sortedAndSearchedPosts.length // posts.length !== 0
-				? <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts about JS:" />
-				: <h1 style={{textAlign: 'center'}}>No Posts</h1>
-			}
-			
+			<PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts about JS:" />
 		</div>
 	);
 }
