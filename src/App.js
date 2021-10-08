@@ -13,11 +13,19 @@ function App() {
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost])
 	}
+	// Get post from child component
+	const removePost = (post) => {
+		setPosts(posts.filter(p => p.id !== post.id))
+	}
 
 	return (
 		<div className="App">
 			<PostForm create={createPost} />
-			<PostList posts={posts} title="Posts about JS:" />
+			{posts.length // posts.length !== 0
+				? <PostList remove={removePost} posts={posts} title="Posts about JS:" />
+				: <h1 style={{textAlign: 'center'}}>No Posts</h1>
+			}
+			
 		</div>
 	);
 }
