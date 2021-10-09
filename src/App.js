@@ -7,12 +7,14 @@ import MyModal from './components/UI/MyModal/MyModal';
 import { usePosts } from './hooks/usePosts';
 import './styles/App.css';
 import PostService from './API/PostService';
+import Loader from './components/UI/Loader/Loader';
 
 function App() {
 	const [posts, setPosts] = useState([]);
 	const [filter, setFilter] = useState({sort: '', query: ''})
 	const [modal, setModal] = useState(false)
 	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
+	const [isPostLoading, setIsPostLoading] = useState(false)
 
 	useEffect(() => {
 		fetchPosts()
@@ -24,8 +26,12 @@ function App() {
 	}
 
 	async function fetchPosts() {
-		const posts = await PostService.getAll()
-		setPosts(posts)
+		setIsPostLoading(true)
+		setTimeout(async () => {
+			const posts = await PostService.getAll()
+			setPosts(posts)
+			setIsPostLoading(false)
+		}, 1000)
 	}
 	// Get post from child component
 	const removePost = (post) => {
@@ -46,7 +52,10 @@ function App() {
 				filter={filter}
 				setFilter={setFilter} 
 			/>
-			<PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
+			{ isPostLoading
+				? <div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}><Loader /></div>
+				: <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
+			}
 		</div>
 	);
 }
