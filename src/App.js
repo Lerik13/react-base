@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PostFilter from './components/PostFilter';
 import PostForm from './components/PostForm';
 import PostList from './components/PostList';
@@ -9,15 +9,24 @@ import './styles/App.css';
 import PostService from './API/PostService';
 import Loader from './components/UI/Loader/Loader';
 import { useFetching } from './hooks/useFetching';
+import { getPageCount } from './utils/pages';
+import { usePagination } from './hooks/usePagination';
 
 function App() {
 	const [posts, setPosts] = useState([]);
 	const [filter, setFilter] = useState({sort: '', query: ''})
 	const [modal, setModal] = useState(false)
+	const [totalPages, setTotalPages] = useState(0)
+	const [limit, setLimit] = useState(10);
+	const [page, setPage] = useState(1);
 	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
+	const pagesArray = usePagination(totalPages)
+
 	const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
-		const posts = await PostService.getAll()
-		setPosts(posts)
+		const response = await PostService.getAll(limit, page)
+		setPosts(response.data)
+		const totalCount = response.headers['x-total-count'];
+		setTotalPages(getPageCount(totalCount, limit))
 	})
 
 	useEffect(() => {
@@ -32,6 +41,11 @@ function App() {
 	// Get post from child component
 	const removePost = (post) => {
 		setPosts(posts.filter(p => p.id !== post.id))
+	}
+
+	const changePage = (page) => {
+		setPage(page)
+		fetchPosts()
 	}
 
 	return (
@@ -52,9 +66,20 @@ function App() {
 				<h1>Error happened: {postError}</h1>
 			}
 			{ isPostLoading
-				? <div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}><Loader /></div>
+				? <div className="loader"><Loader /></div>
 				: <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
 			}
+			<div className="page__wrapper">
+				{pagesArray.map(p => 
+					<span 
+						onClick={() => changePage(p)}
+						key={p} 
+						className={p === page ? 'page page__current' : 'page'}
+					>
+						{p}
+					</span>
+				)}
+			</div>
 		</div>
 	);
 }
