@@ -37,21 +37,3 @@
 	transition: all 500ms ease-in;
 }
 
-.loader {
-	display: flex;
-	justify-content: center;
-	margin-top: 50px;
-}
-.page__wrapper {
-	margin-top: 30px;
-	display: flex;
-}
-.page {
-	padding: 10px;
-	border: 1px solid teal;
-	cursor: pointer;
-}
-.page__current {
-	border: 2px solid orange;
-	font-weight: bold;
-}
