@@ -6,7 +6,6 @@ export const usePagination = (totalPages) => {
 		for (let i = 0; i < totalPages; i++) {
 			result.push(i + 1)
 		}
-		console.log(result);
 		return result
 	}, [totalPages])
 	return pagesArray;

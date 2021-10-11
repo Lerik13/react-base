@@ -22,7 +22,7 @@ function App() {
 	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
 	const pagesArray = usePagination(totalPages)
 
-	const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
+	const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit, page) => {
 		const response = await PostService.getAll(limit, page)
 		setPosts(response.data)
 		const totalCount = response.headers['x-total-count'];
@@ -30,8 +30,8 @@ function App() {
 	})
 
 	useEffect(() => {
-		fetchPosts()
-	}, [page]);
+		fetchPosts(limit, page)
+	}, []);
 	
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost])
@@ -45,11 +45,12 @@ function App() {
 
 	const changePage = (page) => {
 		setPage(page)
+		fetchPosts(limit, page)
 	}
 
 	return (
 		<div className="App">
-			<button onClick={fetchPosts}>GET POSTS</button>
+			<button onClick={() => fetchPosts(limit, page)}>GET POSTS</button>
 			<MyButton style={{marginTop: 30}} onClick={() => setModal(true)}>
 				Create new Post
 			</MyButton>
@@ -64,7 +65,7 @@ function App() {
 			{postError &&
 				<h1>Error happened: {postError}</h1>
 			}
-			{ isPostLoading
+			{ isPostsLoading
 				? <div className="loader"><Loader /></div>
 				: <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
 			}
