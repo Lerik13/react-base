@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PostFilter from '../components/PostFilter';
 import PostForm from '../components/PostForm';
 import PostList from '../components/PostList';
@@ -19,33 +19,17 @@ function Posts() {
 	const [limit, setLimit] = useState(10);
 	const [page, setPage] = useState(1);
 	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
-	const lastElement = useRef()
-	const observer = useRef();
 	
 	const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit, page) => {
 		const response = await PostService.getAll(limit, page)
-		setPosts([...posts,...response.data])
+		setPosts(response.data)
 		const totalCount = response.headers['x-total-count'];
 		setTotalPages(getPageCount(totalCount, limit))
 	})
 
 	useEffect(() => {
-		if (isPostsLoading) return;
-		if (observer.current) observer.current.disconnect()
-
-		var callback = function(entries, observer) {
-			if (entries[0].isIntersecting && page < totalPages) { // don't work during hiding observing element
-				console.log(page);
-				setPage(page + 1)
-			}
-		}
-		observer.current = new IntersectionObserver(callback)
-		observer.current.observe(lastElement.current)
-	}, [isPostsLoading]);
-
-	useEffect(() => {
 		fetchPosts(limit, page)
-	}, [page]);
+	}, []);
 	
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost])
@@ -59,6 +43,7 @@ function Posts() {
 
 	const changePage = (page) => {
 		setPage(page)
+		fetchPosts(limit, page)
 	}
 
 	return (
@@ -78,10 +63,9 @@ function Posts() {
 			{postError &&
 				<h1>Error happened: {postError}</h1>
 			}
-			<PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
-			<div ref={lastElement} style={{height: 20, background: 'red'}}/>
-			{ isPostsLoading &&
-				<div className="loader"><Loader /></div>
+			{ isPostsLoading
+				? <div className="loader"><Loader /></div>
+				: <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Posts:" />
 			}
 			<Pagination
 				page={page}
