@@ -8,6 +8,7 @@ const Navbar = () => {
 	const {isAuth, setIsAuth} = useContext(AuthContext)
 	const logOut = event => {
 		setIsAuth(false)
+		localStorage.removeItem('auth')
 	}
 
 	return (
