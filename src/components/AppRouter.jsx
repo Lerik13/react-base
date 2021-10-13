@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {Route, Switch, Redirect} from "react-router-dom";
+import { AuthContext } from '../context';
 import { privateRoutes, publicRoutes } from '../router';
 
 const AppRouter = () => {
-	const isAuth = false;
+	const {isAuth, setIsAuth} = useContext(AuthContext);
+
 	return (
 		isAuth
 			?
@@ -13,6 +15,7 @@ const AppRouter = () => {
 						component={route.component}
 						path={route.path}
 						exact={route.exact}
+						key={route.path}
 					/>
 				)}
 				<Redirect to='/posts'/>
@@ -24,6 +27,7 @@ const AppRouter = () => {
 						component={route.component}
 						path={route.path}
 						exact={route.exact}
+						key={route.path}
 					/>
 				)}
 				<Redirect to='/login'/>
